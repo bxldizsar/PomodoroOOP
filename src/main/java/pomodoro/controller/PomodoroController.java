@@ -3,7 +3,7 @@ package pomodoro.controller;
 import javax.swing.Timer;
 import pomodor.model.PomodoroModel;
 import pomodoro.view.BeallitasokDialog;
-import pomodor.view.PomodoroView;
+import pomodoro.view.PomodoroView;
 
 // osszekoti a gombokat a modellel es vezerli az idozitot
 public class PomodoroController

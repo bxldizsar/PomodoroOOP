@@ -1,4 +1,4 @@
-package pomodor.view;
+package pomodoro.view;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

@@ -3,7 +3,7 @@ package pomodoro.main;
 import javax.swing.SwingUtilities;
 import pomodoro.controller.PomodoroController;
 import pomodor.model.PomodoroModel;
-import pomodor.view.PomodoroView;
+import pomodoro.view.PomodoroView;
 
 public class Main
 {
