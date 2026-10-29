@@ -121,6 +121,14 @@ public class PomodoroModel
         ertesitAllapot(); // szolunk a  figyelonek
     }
     
+    public void setIdotartamok(int munka, int rovidSzunet, int hosszuSzunet) 
+    {
+        munkaMasodperc = munka;
+        rovidSzunetMasodperc = rovidSzunet;
+        hosszuSzunetMasodperc = hosszuSzunet;
+        reset();
+    }
+    
     public Allapot getAllapot()
     {
         return allapot;

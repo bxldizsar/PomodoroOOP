@@ -6,47 +6,55 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class PomodoroModelTest {
-
+public class PomodoroModelTest
+{
     private PomodoroModel model;
 
-    // Minden teszt előtt lefut: mindegyik teszt friss modellel indul.
+    // minden teszt elott friss modell
     @BeforeEach
-    public void setUp() {
+    public void setUp()
+    {
         model = new PomodoroModel();
     }
 
-    // Segédmetódus: n-szer "eltelik egy másodperc".
-    private void tick(int n) {
-        for (int i = 0; i < n; i++) {
+    // n-szer eltelik egy masodperc
+    private void tick(int n)
+    {
+        for(int i = 0; i < n; i++)
+        {
             model.tick();
         }
     }
 
-    // Végigvisz egy munkakört és az utána jövő rövid szünetet.
-    private void egyKorRovidSzunettel() {
+    // egy munkakor es utana a rovid szunet
+    private void egyKorRovidSzunettel()
+    {
         tick(model.getMunkaMasodperc());
         tick(model.getRovidSzunetMasodperc());
     }
 
-    // "Hamis" figyelő: nem rajzol semmit, csak feljegyzi, mit kapott.
-    private static class TesztFigyelo implements PomodoroFigyelo {
+    // hamis figyelo, csak feljegyzi mit kapott
+    private static class TesztFigyelo implements PomodoroFigyelo
+    {
         List<Integer> tikkek = new ArrayList<>();
         List<Allapot> allapotok = new ArrayList<>();
 
         @Override
-        public void tikk(int hatralevoMasodperc) {
+        public void tikk(int hatralevoMasodperc)
+        {
             tikkek.add(hatralevoMasodperc);
         }
 
         @Override
-        public void allapotValtozott(Allapot uj) {
+        public void allapotValtozott(Allapot uj)
+        {
             allapotok.add(uj);
         }
     }
 
     @Test
-    public void kezdetbenSzunetel() {
+    public void kezdetbenSzunetel()
+    {
         assertEquals(Allapot.SZUNETEL, model.getAllapot());
         assertEquals(Allapot.MUNKA, model.getFazis());
         assertEquals(1500, model.getHatralevoMasodperc());
@@ -54,39 +62,44 @@ public class PomodoroModelTest {
     }
 
     @Test
-    public void startUtanMunka() {
+    public void startUtanMunka()
+    {
         model.start();
         assertEquals(Allapot.MUNKA, model.getAllapot());
     }
 
     @Test
-    public void tickCsokkentiAzIdot() {
+    public void tickCsokkentiAzIdot()
+    {
         model.start();
         model.tick();
         assertEquals(1499, model.getHatralevoMasodperc());
     }
 
     @Test
-    public void szunetMegallitjaAzOrat() {
+    public void szunetMegallitjaAzOrat()
+    {
         model.start();
         model.tick();
         model.szunet();
-        tick(10); // szünet közben a tick-nek nem szabad hatnia
+        tick(10); // szunetben nem fogyhat az ido
         assertEquals(Allapot.SZUNETEL, model.getAllapot());
         assertEquals(1499, model.getHatralevoMasodperc());
     }
 
     @Test
-    public void szunetUtanStartOttFolytatja() {
+    public void szunetUtanStartOttFolytatja()
+    {
         model.start();
-        tick(model.getMunkaMasodperc()); // vége a munkának -> rövid szünet
+        tick(model.getMunkaMasodperc()); // vege a munkanak, rovid szunet jon
         model.szunet();
         model.start();
         assertEquals(Allapot.ROVID_SZUNET, model.getAllapot());
     }
 
     @Test
-    public void munkaUtanRovidSzunet() {
+    public void munkaUtanRovidSzunet()
+    {
         model.start();
         tick(model.getMunkaMasodperc());
         assertEquals(Allapot.ROVID_SZUNET, model.getAllapot());
@@ -95,7 +108,8 @@ public class PomodoroModelTest {
     }
 
     @Test
-    public void rovidSzunetUtanMunka() {
+    public void rovidSzunetUtanMunka()
+    {
         model.start();
         egyKorRovidSzunettel();
         assertEquals(Allapot.MUNKA, model.getAllapot());
@@ -103,21 +117,24 @@ public class PomodoroModelTest {
     }
 
     @Test
-    public void negyedikKorUtanHosszuSzunet() {
+    public void negyedikKorUtanHosszuSzunet()
+    {
         model.start();
-        for (int i = 0; i < 3; i++) {
+        for(int i = 0; i < 3; i++)
+        {
             egyKorRovidSzunettel();
         }
-        tick(model.getMunkaMasodperc()); // a 4. munkakör vége
+        tick(model.getMunkaMasodperc()); // a 4. munkakor vege
         assertEquals(4, model.getBefejezettKorok());
         assertEquals(Allapot.HOSSZU_SZUNET, model.getAllapot());
         assertEquals(900, model.getHatralevoMasodperc());
     }
 
     @Test
-    public void resetMindentAlaphelyzetbeAllit() {
+    public void resetMindentAlaphelyzetbeAllit()
+    {
         model.start();
-        tick(model.getMunkaMasodperc() + 10); // már a rövid szünetben járunk
+        tick(model.getMunkaMasodperc() + 10); // mar a rovid szunetben vagyunk
         model.reset();
         assertEquals(Allapot.SZUNETEL, model.getAllapot());
         assertEquals(Allapot.MUNKA, model.getFazis());
@@ -126,7 +143,8 @@ public class PomodoroModelTest {
     }
 
     @Test
-    public void figyeloErtesitestKap() {
+    public void figyeloErtesitestKap()
+    {
         TesztFigyelo figyelo = new TesztFigyelo();
         model.feliratkoz(figyelo);
         model.start();
