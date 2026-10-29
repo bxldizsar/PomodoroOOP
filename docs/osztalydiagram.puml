@@ -1,0 +1,102 @@
+@startuml
+title Pomodoro-óra – osztálydiagram (MVC + Observer)
+skinparam classAttributeIconSize 0
+
+package pomodor.model {
+  enum Allapot {
+    MUNKA
+    ROVID_SZUNET
+    HOSSZU_SZUNET
+    SZUNETEL
+  }
+
+  interface PomodoroFigyelo <<Observer>> {
+    +tikk(hatralevoMasodperc : int)
+    +allapotValtozott(uj : Allapot)
+  }
+
+  class PomodoroModel <<Subject>> {
+    -allapot : Allapot
+    -fazis : Allapot
+    -hatralevoMasodperc : int
+    -befejezettKorok : int
+    -figyelok : List<PomodoroFigyelo>
+    -munkaMasodperc : int = 1500
+    -rovidSzunetMasodperc : int = 300
+    -hosszuSzunetMasodperc : int = 900
+    +PomodoroModel()
+    +feliratkoz(f : PomodoroFigyelo)
+    +start()
+    +szunet()
+    +reset()
+    +tick()
+    +setIdotartamok(munka : int, rovidSzunet : int, hosszuSzunet : int)
+    +getAllapot() : Allapot
+    +getFazis() : Allapot
+    +getHatralevoMasodperc() : int
+    +getBefejezettKorok() : int
+    -kovetkezoFazis()
+    -ertesitTikk()
+    -ertesitAllapot()
+  }
+}
+
+package pomodor.view {
+  class PomodoroView <<ConcreteObserver>> {
+    -model : PomodoroModel
+    -idoFelirat : JLabel
+    -allapotFelirat : JLabel
+    -startGomb : JButton
+    -szunetGomb : JButton
+    -resetGomb : JButton
+    -beallitasokGomb : JButton
+    +tikk(hatralevoMasodperc : int)
+    +allapotValtozott(uj : Allapot)
+    +addStartListener(l : ActionListener)
+    +addSzunetListener(l : ActionListener)
+    +addResetListener(l : ActionListener)
+    +addBeallitasokListener(l : ActionListener)
+    -frissit()
+  }
+
+  class BeallitasokDialog {
+    -jovahagyva : boolean
+    +isJovahagyva() : boolean
+    +getMunkaPerc() : int
+    +getRovidSzunetPerc() : int
+    +getHosszuSzunetPerc() : int
+  }
+}
+
+package pomodor.controller {
+  class PomodoroController {
+    -model : PomodoroModel
+    -view : PomodoroView
+    -idozito : javax.swing.Timer
+    -beallitasokMegnyitasa()
+  }
+}
+
+package javax.swing {
+  class JFrame
+  class JDialog
+}
+
+class pomodor.Main {
+  +{static} main(args : String[])
+}
+
+PomodoroModel "1" o-- "0..*" PomodoroFigyelo : figyelok\n(értesíti)
+PomodoroModel --> Allapot
+PomodoroFigyelo ..> Allapot
+PomodoroView ..|> PomodoroFigyelo : implementálja
+PomodoroView --|> JFrame
+BeallitasokDialog --|> JDialog
+PomodoroView --> PomodoroModel : olvassa,\nfeliratkozik
+PomodoroController --> PomodoroModel : start / szunet /\nreset / tick
+PomodoroController --> PomodoroView : listenereket ad
+PomodoroController ..> BeallitasokDialog : megnyitja (modális)
+pomodor.Main ..> PomodoroModel : létrehozza
+pomodor.Main ..> PomodoroView : létrehozza
+pomodor.Main ..> PomodoroController : létrehozza
+@enduml
